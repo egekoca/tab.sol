@@ -24,8 +24,8 @@ Colosseum Crypto World's Fair — Solana Track · Son teslim: 12 Ekim 2026 (SGT,
 - ✅ Anchor programı (`Pool`, `AgentCredit`, `Merchant`, `CreditChannel` + MVP instruction'ları) `anchor build` ile temiz derleniyor
 - ✅ Mainnet Payment Channels programı (`CHNLx...GsX`) yerel validator'a klonlanıp doğrulandı
 - ✅ Canlı, bilingual (TR/EN), tıklanabilir demo dashboard'u — [tab-sol.vercel.app](https://tab-sol.vercel.app)
+- ✅ Program devnet'e deploy edildi: [`FC7xf3zqq79LyFPTPTvM3ZTTFXm8ZStrNdWKKGZeYyJt`](https://solscan.io/account/FC7xf3zqq79LyFPTPTvM3ZTTFXm8ZStrNdWKKGZeYyJt?cluster=devnet) — [deploy işlemi](https://solscan.io/tx/4ZimgNoYmTE1NQTp7Vf6ZNzpAQsfFc7o6RtSrxtbThL7uzKkm4mCuhW83Ti8PkqDfqP8nKfYGWhAGjFSPE96Xyq7?cluster=devnet)
 - ⏳ `open`/`topUp`/`requestClose` için ham CPI instruction layout'u (Pinocchio programının Anchor IDL'i yok) — bkz. `payment_channels.rs`
-- ⏳ Devnet'te gerçek bir işlem (Solscan linki)
 
 ## Monorepo yapısı
 
