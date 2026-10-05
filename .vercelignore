@@ -1,0 +1,7 @@
+node_modules
+apps/program/target
+apps/program/.anchor
+apps/program/test-ledger
+apps/program/Cargo.lock
+**/*.so
+.git
