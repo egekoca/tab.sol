@@ -1,23 +1,27 @@
+"use client";
+
 import Image from "next/image";
 import { StatCard } from "@/components/StatCard";
-import { EventFeed, type FeedEvent } from "@/components/EventFeed";
+import { EventFeed } from "@/components/EventFeed";
+import { DemoControls } from "@/components/DemoControls";
+import { useDemoState } from "@/lib/useDemoState";
 
-// TODO: aşağıdaki mock veriler Tab programından (Anchor Program istemcisi /
-// keeper API'si) okunacak. Bkz. docs/Tab_Proje_Dokumani.md §15 Demo Senaryosu.
-const mockEvents: FeedEvent[] = [
-  { id: "1", label: "LP $1.000 USDC yatırdı", detail: "tUSDC mint edildi · havuz TVL güncellendi", tone: "info" },
-  { id: "2", label: "Operatör ajanı kaydetti", detail: "bond $50 → limit $50 (1.0x)", tone: "info" },
-  { id: "3", label: "Kredili kanal açıldı", detail: "tavan $5 · payer = Pool PDA · signer = Ajan", tone: "info" },
-  { id: "4", label: "Kanal kapandı, iade havuza döndü", detail: "$2.80 merchant'a · $2.20 havuza — AHA anı", tone: "success" },
-  { id: "5", label: "Allowlist dışı kanal denemesi reddedildi", detail: "merchant onaylı değil", tone: "danger" },
-];
+const usd = (n: number) => `$${n.toFixed(2)}`;
 
 export default function DashboardPage() {
+  const { state, connected, dispatch } = useDemoState();
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <header className="flex items-center justify-between">
         <Image src="/brand/tab-wordmark-white.svg" alt="tab." width={120} height={48} priority />
-        <p className="text-sm text-cloud/50">AI ajanları için payment channel tabanlı kredi protokolü</p>
+        <div className="flex items-center gap-3">
+          <span
+            className={`h-2 w-2 rounded-full ${connected ? "bg-emerald-400" : "bg-cherry"}`}
+            title={connected ? "mock-merchant bağlı" : "mock-merchant'a bağlanılamıyor"}
+          />
+          <p className="text-sm text-cloud/50">AI ajanları için payment channel tabanlı kredi protokolü</p>
+        </div>
       </header>
 
       <section className="mt-10 rounded-2xl border border-white/10 bg-gradient-to-br from-cherry/20 to-transparent p-8">
@@ -31,37 +35,51 @@ export default function DashboardPage() {
       </section>
 
       <section className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard label="Havuz TVL" value="$1.000" hint="tUSDC" />
-        <StatCard label="Açık Maruziyet" value="$5.00" hint="1 aktif kanal" />
-        <StatCard label="Ajan Limiti" value="$50.00" hint="bond × 1.0x" />
-        <StatCard label="Protokol Skoru" value="0 / 1000" hint="yeni ajan" />
+        <StatCard label="Havuz TVL" value={usd(state.pool.tvl)} hint="tUSDC" />
+        <StatCard label="Açık Maruziyet" value={usd(state.pool.openExposure)} hint={state.channel.open ? "1 aktif kanal" : "0 aktif kanal"} />
+        <StatCard label="Ajan Limiti" value={usd(state.agent.limit)} hint={`bond ${usd(state.agent.bond)}`} />
+        <StatCard label="Protokol Skoru" value={`${state.agent.score} / 1000`} hint={state.agent.status === "none" ? "kayıtsız" : state.agent.status} />
       </section>
 
       <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 lg:col-span-1">
-          <h2 className="text-sm font-medium text-cloud/70">Ajan Terminali</h2>
-          <pre className="mt-3 overflow-x-auto rounded-lg bg-black/40 p-3 text-xs text-emerald-300">
-{`$ pnpm dev:agent
-[agent] tüketilen: $0.14 → {...}
-[agent] tüketilen: $0.28 → {...}`}
-          </pre>
+          <h2 className="text-sm font-medium text-cloud/70">Ajan Durumu</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            <div className="flex justify-between"><span className="text-cloud/50">Durum</span><span>{state.agent.status === "none" ? "—" : state.agent.status}</span></div>
+            <div className="flex justify-between"><span className="text-cloud/50">Bond</span><span>{usd(state.agent.bond)}</span></div>
+            <div className="flex justify-between"><span className="text-cloud/50">Açık Borç</span><span>{usd(state.agent.debt)}</span></div>
+            <div className="flex justify-between"><span className="text-cloud/50">Cüzdan Bakiyesi</span><span className="font-semibold text-cherry">$0.00</span></div>
+          </div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 lg:col-span-1">
           <h2 className="text-sm font-medium text-cloud/70">Kanal Durumu</h2>
           <div className="mt-3 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-cloud/50">Deposit</span><span>$5.00</span></div>
-            <div className="flex justify-between"><span className="text-cloud/50">Settled</span><span>$2.80</span></div>
-            <div className="flex justify-between"><span className="text-cloud/50">Durum</span><span className="text-emerald-400">Open</span></div>
+            <div className="flex justify-between"><span className="text-cloud/50">Deposit</span><span>{usd(state.channel.deposit)}</span></div>
+            <div className="flex justify-between"><span className="text-cloud/50">Settled</span><span>{usd(state.channel.settled)}</span></div>
+            <div className="flex justify-between">
+              <span className="text-cloud/50">Durum</span>
+              <span className={state.channel.open ? "text-emerald-400" : "text-cloud/40"}>
+                {state.channel.open ? "Open" : "Closed"}
+              </span>
+            </div>
           </div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 lg:col-span-1">
           <h2 className="text-sm font-medium text-cloud/70">Olay Akışı</h2>
-          <div className="mt-3">
-            <EventFeed events={mockEvents} />
+          <div className="mt-3 max-h-64 overflow-y-auto">
+            {state.events.length === 0 ? (
+              <p className="text-xs text-cloud/40">Henüz olay yok — demoyu başlatmak için sağdaki adımları kullanın.</p>
+            ) : (
+              <EventFeed events={state.events} />
+            )}
           </div>
         </div>
+      </section>
+
+      <section className="mt-6">
+        <DemoControls onDispatch={dispatch} onReset={() => dispatch("reset")} />
       </section>
     </main>
   );

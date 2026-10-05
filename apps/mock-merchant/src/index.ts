@@ -1,7 +1,11 @@
 import express from "express";
+import type { DemoAction } from "./demoState.js";
+import { applyAction, getState } from "./demoState.js";
 
 /**
- * Mock merchant: paralı inference proxy (§7.1, §15 demo adım 4-7).
+ * Mock merchant: paralı inference proxy (§7.1, §15 demo adım 4-7) + demo
+ * motoru API'si. Gün 2 Plan B (§6.2): gerçek Payment Channels CPI'si
+ * tamamlanana kadar demo bu simüle edilmiş durum üzerinden akıcı çalışır.
  * pay-kit'in high-throughput proxy şablonu temel alınacak:
  * https://solana.com/developers/templates/pay-high-throughput-proxy
  *
@@ -12,6 +16,13 @@ import express from "express";
  */
 const app = express();
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
 const PORT = process.env.PORT ?? 4001;
 
@@ -48,6 +59,32 @@ app.post("/v1/inference/summarize", (req, res) => {
 });
 
 app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+const DEMO_ACTIONS: DemoAction[] = [
+  "reset",
+  "lp_deposit",
+  "register_agent",
+  "open_channel",
+  "consume",
+  "settle_close",
+  "repay",
+  "bad_agent_consume",
+  "bad_agent_default",
+  "blocked_attack",
+];
+
+app.get("/v1/demo/state", (_req, res) => {
+  res.json(getState());
+});
+
+app.post("/v1/demo/action", (req, res) => {
+  const { action } = req.body as { action?: string };
+  if (!action || !DEMO_ACTIONS.includes(action as DemoAction)) {
+    return res.status(400).json({ error: `geçersiz action. Beklenen: ${DEMO_ACTIONS.join(", ")}` });
+  }
+  const state = applyAction(action as DemoAction);
+  res.json(state);
+});
 
 app.listen(PORT, () => {
   console.log(`[mock-merchant] dinleniyor: http://localhost:${PORT}`);
