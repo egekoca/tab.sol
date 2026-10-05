@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SolanaProvider } from "@/components/SolanaProvider";
 
 export const metadata: Metadata = {
   title: "tab.",
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr">
-      <body className="min-h-screen bg-obsidian text-cloud font-sans">{children}</body>
+      <body className="min-h-screen bg-obsidian text-cloud font-sans">
+        <SolanaProvider>{children}</SolanaProvider>
+      </body>
     </html>
   );
 }
