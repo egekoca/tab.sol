@@ -8,7 +8,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("TabXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+declare_id!("FC7xf3zqq79LyFPTPTvM3ZTTFXm8ZStrNdWKKGZeYyJt");
 
 /// Tab — AI ajanlarına Solana Payment Channels üzerinden amaca bağlı kredi
 /// açan protokol. Mimari ve akışlar için bkz. docs/Tab_Proje_Dokumani.md.
