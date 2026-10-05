@@ -1,0 +1,17 @@
+node_modules/
+.pnpm-store/
+dist/
+.next/
+out/
+.env
+.env.local
+*.log
+
+# Anchor / Solana
+apps/program/target/
+apps/program/.anchor/
+apps/program/test-ledger/
+**/*.so
+
+# OS
+.DS_Store

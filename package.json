@@ -1,0 +1,15 @@
+{
+  "name": "tab-protocol",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Tab — Payment Channel tabanlı kredi protokolü (AI ajanları için)",
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev:frontend": "pnpm --filter @tab/frontend dev",
+    "dev:keeper": "pnpm --filter @tab/keeper dev",
+    "dev:merchant": "pnpm --filter @tab/mock-merchant dev",
+    "dev:agent": "pnpm --filter @tab/demo-agent dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  }
+}
