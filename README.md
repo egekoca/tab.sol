@@ -1,10 +1,31 @@
-# tab.
+<p align="center">
+  <img src="brand/logo/tab-icon-burgundy.png" width="88" alt="tab.">
+</p>
+
+<h1 align="center">tab.</h1>
+<p align="center"><strong>Your agent runs a tab. LPs earn the yield.</strong></p>
+
+<p align="center">
+  <a href="https://tab-sol.vercel.app"><strong>Canlı Demo →</strong></a>
+  &nbsp;·&nbsp;
+  <a href="./docs/Tab_Proje_Dokumani.md">Proje Dokümanı</a>
+  &nbsp;·&nbsp;
+  <a href="https://colosseum.com/worldsfair">Colosseum Crypto World's Fair</a>
+</p>
+
+---
 
 AI ajanlarına Solana **Payment Channels** üzerinden amaca bağlı kredi açan protokol. Para sadece onaylı merchant'lara akar, harcanmayan kısım otomatik olarak LP'lere geri döner, temerrüt riski önce ajanın stake'inden karşılanır.
 
-> Tam proje dokümanı (problem, mimari, akışlar, 7 günlük plan, pitch senaryosu): [`docs/Tab_Proje_Dokumani.md`](./docs/Tab_Proje_Dokumani.md)
-
 Colosseum Crypto World's Fair — Solana Track · Son teslim: 12 Ekim 2026 (SGT, platformdan teyit edilmeli)
+
+## Durum
+
+- ✅ Anchor programı (`Pool`, `AgentCredit`, `Merchant`, `CreditChannel` + MVP instruction'ları) `anchor build` ile temiz derleniyor
+- ✅ Mainnet Payment Channels programı (`CHNLx...GsX`) yerel validator'a klonlanıp doğrulandı
+- ✅ Canlı, bilingual (TR/EN), tıklanabilir demo dashboard'u — [tab-sol.vercel.app](https://tab-sol.vercel.app)
+- ⏳ `open`/`topUp`/`requestClose` için ham CPI instruction layout'u (Pinocchio programının Anchor IDL'i yok) — bkz. `payment_channels.rs`
+- ⏳ Devnet'te gerçek bir işlem (Solscan linki)
 
 ## Monorepo yapısı
 
@@ -45,7 +66,7 @@ cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
 avm install latest && avm use latest
 ```
 
-### Gün 1 — CPI spike (öncelik #1)
+### CPI spike
 
 ```bash
 solana-test-validator \
@@ -58,12 +79,12 @@ solana-test-validator \
 ### Geliştirme
 
 ```bash
-pnpm dev:frontend     # http://localhost:3000
+pnpm dev:frontend     # http://localhost:3000 — backend gerektirmez, demo motoru tarayıcıda çalışır
 pnpm dev:keeper
-pnpm dev:merchant     # http://localhost:4001
+pnpm dev:merchant     # http://localhost:4001 — yerel çok-süreçli demo için (demo-agent CLI)
 pnpm dev:agent
 
-cd apps/program && anchor test
+cd apps/program && anchor build && anchor test
 ```
 
 ## Marka
