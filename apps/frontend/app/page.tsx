@@ -11,7 +11,7 @@ import { useLang } from "@/lib/i18n";
 const usd = (n: number) => `$${n.toFixed(2)}`;
 
 export default function DashboardPage() {
-  const { state, connected, dispatch } = useDemoState();
+  const { state, dispatch } = useDemoState();
   const { t, lang, setLang } = useLang();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
 
@@ -29,13 +29,7 @@ export default function DashboardPage() {
       <header className="flex flex-wrap items-center justify-between gap-4">
         <Image src="/brand/tab-wordmark-white.svg" alt="tab." width={140} height={56} priority />
         <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2.5">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${connected ? "bg-emerald-400" : "bg-cherry"}`}
-              title={connected ? t("connected") : t("disconnected")}
-            />
-            <p className="text-base text-cloud/60">{t("tagline")}</p>
-          </div>
+          <p className="text-base text-cloud/60">{t("tagline")}</p>
           <div className="flex overflow-hidden rounded-lg border border-white/15 text-sm font-medium">
             <button
               onClick={() => setLang("tr")}

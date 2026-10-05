@@ -1,73 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useReducer } from "react";
+import { applyDemoAction, initialDemoState, type DemoAction, type DemoState } from "@tab/shared";
 
-const MERCHANT_URL = process.env.NEXT_PUBLIC_TAB_MERCHANT_URL ?? "http://localhost:4001";
+export type { DemoState, DemoEvent } from "@tab/shared";
 
-export interface DemoEvent {
-  id: string;
-  key: string;
-  params: Record<string, string | number>;
-  tone: "info" | "success" | "danger";
-  at: number;
-}
+/**
+ * Runs the shared demo reducer entirely client-side. No backend required —
+ * this is what makes the publicly deployed dashboard work standalone for
+ * anyone who opens the live link, with no server/state-persistence concerns.
+ * apps/mock-merchant runs the exact same reducer behind a REST API for
+ * local multi-process demos (e.g. driving it from the demo-agent CLI).
+ */
+export function useDemoState() {
+  const [state, dispatchAction] = useReducer(
+    (s: DemoState, action: DemoAction) => applyDemoAction(s, action),
+    undefined,
+    initialDemoState
+  );
 
-export interface DemoState {
-  pool: { tvl: number; openExposure: number };
-  agent: {
-    bond: number;
-    limit: number;
-    debt: number;
-    score: number;
-    status: "none" | "Active" | "Defaulted";
-  };
-  channel: { deposit: number; settled: number; open: boolean };
-  events: DemoEvent[];
-}
+  const dispatch = useCallback((action: string) => {
+    dispatchAction(action as DemoAction);
+  }, []);
 
-const EMPTY_STATE: DemoState = {
-  pool: { tvl: 0, openExposure: 0 },
-  agent: { bond: 0, limit: 0, debt: 0, score: 0, status: "none" },
-  channel: { deposit: 0, settled: 0, open: false },
-  events: [],
-};
-
-export function useDemoState(pollMs = 1000) {
-  const [state, setState] = useState<DemoState>(EMPTY_STATE);
-  const [connected, setConnected] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function poll() {
-      try {
-        const res = await fetch(`${MERCHANT_URL}/v1/demo/state`, { cache: "no-store" });
-        if (!res.ok) throw new Error(String(res.status));
-        const data: DemoState = await res.json();
-        if (!cancelled) {
-          setState(data);
-          setConnected(true);
-        }
-      } catch {
-        if (!cancelled) setConnected(false);
-      }
-    }
-
-    poll();
-    const interval = setInterval(poll, pollMs);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [pollMs]);
-
-  async function dispatch(action: string) {
-    await fetch(`${MERCHANT_URL}/v1/demo/action`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ action }),
-    });
-  }
-
-  return { state, connected, dispatch };
+  return { state, connected: true, dispatch };
 }

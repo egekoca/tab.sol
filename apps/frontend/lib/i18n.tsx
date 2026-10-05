@@ -12,9 +12,6 @@ const tr: Dict = {
   heroTitleHighlight: "LPs earn the yield.",
   heroSubtitle:
     "Para sadece onaylı merchant'lara akar · harcanmayan kısım otomatik olarak LP'lere geri döner · ajan ele geçirilse bile kredi çalınamaz.",
-  connected: "mock-merchant bağlı",
-  disconnected: "mock-merchant'a bağlanılamıyor",
-
   statPoolTvl: "Havuz TVL",
   statPoolTvlHint: "tUSDC",
   statExposure: "Açık Maruziyet",
@@ -90,9 +87,6 @@ const en: Dict = {
   heroTitleHighlight: "LPs earn the yield.",
   heroSubtitle:
     "Funds can only flow to approved merchants · unspent credit auto-returns to LPs · credit can't be stolen even if the agent is compromised.",
-  connected: "connected to mock-merchant",
-  disconnected: "can't reach mock-merchant",
-
   statPoolTvl: "Pool TVL",
   statPoolTvlHint: "tUSDC",
   statExposure: "Open Exposure",
