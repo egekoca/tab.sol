@@ -29,7 +29,7 @@ pub struct LpDeposit<'info> {
 }
 
 /// share_price = total_assets / share_supply (ilk mevduatta 1:1).
-pub fn handler(ctx: Context<LpDeposit>, amount: u64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<LpDeposit>, amount: u64) -> Result<()> {
     require!(amount > 0, TabError::MathOverflow);
 
     let pool = &mut ctx.accounts.pool;

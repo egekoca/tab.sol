@@ -25,7 +25,7 @@ pub struct RegisterMerchant<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<RegisterMerchant>, mdr_bps: u16, settle_sla_secs: i64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<RegisterMerchant>, mdr_bps: u16, settle_sla_secs: i64) -> Result<()> {
     let merchant = &mut ctx.accounts.merchant;
     merchant.payee = ctx.accounts.payee.key();
     merchant.bond = 0;

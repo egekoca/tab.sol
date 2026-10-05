@@ -46,7 +46,7 @@ pub struct InitializePool<'info> {
     pub rent: Sysvar<'info, Rent>,
 }
 
-pub fn handler(
+pub(crate) fn handler(
     ctx: Context<InitializePool>,
     protocol_fee_bps: u16,
     senior_share_bps: u16,

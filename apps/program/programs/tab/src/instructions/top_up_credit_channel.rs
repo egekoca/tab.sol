@@ -36,7 +36,7 @@ pub struct TopUpCreditChannel<'info> {
     pub payment_channels_program: UncheckedAccount<'info>,
 }
 
-pub fn handler(ctx: Context<TopUpCreditChannel>, increment: u64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<TopUpCreditChannel>, increment: u64) -> Result<()> {
     let agent_credit = &mut ctx.accounts.agent_credit;
     let merchant = &mut ctx.accounts.merchant;
     let pool = &mut ctx.accounts.pool;

@@ -21,7 +21,7 @@ pub struct RegisterAgent<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<RegisterAgent>, agent_signer: Pubkey, daily_limit: u64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<RegisterAgent>, agent_signer: Pubkey, daily_limit: u64) -> Result<()> {
     let agent_credit = &mut ctx.accounts.agent_credit;
     agent_credit.operator = ctx.accounts.operator.key();
     agent_credit.agent_signer = agent_signer;

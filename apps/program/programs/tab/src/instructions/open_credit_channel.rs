@@ -9,6 +9,7 @@ use crate::state::{AgentCredit, AgentStatus, CreditChannel, Merchant, MerchantSt
 /// Pool PDA `payer`, ajan `authorizedSigner`, merchant `payee` olur.
 #[derive(Accounts)]
 pub struct OpenCreditChannel<'info> {
+    #[account(mut)]
     pub agent_signer: Signer<'info>,
 
     #[account(mut, seeds = [POOL_SEED], bump = pool.bump)]
@@ -49,7 +50,7 @@ pub struct OpenCreditChannel<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<OpenCreditChannel>, ceiling: u64, grace_period_secs: i64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<OpenCreditChannel>, ceiling: u64, grace_period_secs: i64) -> Result<()> {
     let agent_credit = &mut ctx.accounts.agent_credit;
     let merchant = &mut ctx.accounts.merchant;
     let pool = &mut ctx.accounts.pool;

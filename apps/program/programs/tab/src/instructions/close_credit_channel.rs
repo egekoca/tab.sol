@@ -37,7 +37,7 @@ pub struct CloseCreditChannel<'info> {
     pub payment_channels_program: UncheckedAccount<'info>,
 }
 
-pub fn handler(ctx: Context<CloseCreditChannel>) -> Result<()> {
+pub(crate) fn handler(ctx: Context<CloseCreditChannel>) -> Result<()> {
     let credit_channel = &mut ctx.accounts.credit_channel;
     require!(credit_channel.open, TabError::ChannelAlreadyClosed);
 

@@ -26,7 +26,7 @@ pub struct Repay<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler(ctx: Context<Repay>, amount: u64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<Repay>, amount: u64) -> Result<()> {
     let agent_credit = &mut ctx.accounts.agent_credit;
     require!(amount <= agent_credit.debt, TabError::RepayExceedsDebt);
 

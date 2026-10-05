@@ -27,7 +27,7 @@ pub struct RecordSettlement<'info> {
 }
 
 /// `fee_bps`: kredi ücreti (§11.1, örn. %1).
-pub fn handler(ctx: Context<RecordSettlement>, settled: u64, fee_bps: u16, now: i64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<RecordSettlement>, settled: u64, fee_bps: u16, now: i64) -> Result<()> {
     let credit_channel = &mut ctx.accounts.credit_channel;
     let agent_credit = &mut ctx.accounts.agent_credit;
 

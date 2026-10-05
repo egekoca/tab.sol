@@ -19,7 +19,7 @@ pub struct MarkDefault<'info> {
     // remaining_accounts ile iterasyonla yapılacak (gün 1 spike sonrası).
 }
 
-pub fn handler(ctx: Context<MarkDefault>, now: i64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<MarkDefault>, now: i64) -> Result<()> {
     let agent_credit = &mut ctx.accounts.agent_credit;
 
     require!(agent_credit.due_at != 0, TabError::NotYetDue);

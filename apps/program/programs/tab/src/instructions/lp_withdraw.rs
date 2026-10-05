@@ -30,7 +30,7 @@ pub struct LpWithdraw<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler(ctx: Context<LpWithdraw>, shares: u64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<LpWithdraw>, shares: u64) -> Result<()> {
     require!(shares > 0, TabError::MathOverflow);
 
     let pool = &mut ctx.accounts.pool;

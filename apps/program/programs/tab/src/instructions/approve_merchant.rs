@@ -14,7 +14,7 @@ pub struct ApproveMerchant<'info> {
     pub merchant: Account<'info, Merchant>,
 }
 
-pub fn handler(ctx: Context<ApproveMerchant>, exposure_cap: u64) -> Result<()> {
+pub(crate) fn handler(ctx: Context<ApproveMerchant>, exposure_cap: u64) -> Result<()> {
     let merchant = &mut ctx.accounts.merchant;
     merchant.exposure_cap = exposure_cap;
     merchant.status = MerchantStatus::Approved;
