@@ -1,16 +1,19 @@
 /**
- * Demo motoru (§15 Demo Senaryosu): gerçek zincir yerine, demo günü için
- * eksiksiz ve güvenilir çalışan simüle edilmiş durum makinesi. Plan B
- * (§6.2): CPI tamamlanana kadar aynı arayüzü taklit eden akış — demo yine
- * de akıcı olur.
+ * Demo engine (doc §15 Demo Senaryosu): instead of the real chain, a
+ * reliable simulated state machine for demo day. Plan B (§6.2): until the
+ * real Payment Channels CPI is wired up, mimic the same interface so the
+ * demo stays smooth.
+ *
+ * Events carry an i18n key + params instead of rendered text — the
+ * frontend renders them in whichever language the presenter picked.
  */
 
 export type EventTone = "info" | "success" | "danger";
 
 export interface DemoEvent {
   id: string;
-  label: string;
-  detail: string;
+  key: string;
+  params: Record<string, string | number>;
   tone: EventTone;
   at: number;
 }
@@ -41,9 +44,9 @@ function initialState(): DemoState {
 
 let state: DemoState = initialState();
 
-function pushEvent(label: string, detail: string, tone: EventTone) {
+function pushEvent(key: string, params: Record<string, string | number>, tone: EventTone) {
   state.events = [
-    { id: crypto.randomUUID(), label, detail, tone, at: Date.now() },
+    { id: crypto.randomUUID(), key, params, tone, at: Date.now() },
     ...state.events,
   ].slice(0, 30);
 }
@@ -68,22 +71,22 @@ export function applyAction(action: DemoAction): DemoState {
   switch (action) {
     case "reset": {
       state = initialState();
-      pushEvent("Demo sıfırlandı", "Tüm durum başlangıç değerlerine döndü", "info");
+      pushEvent("event.reset", {}, "info");
       break;
     }
 
     case "lp_deposit": {
       state.pool.tvl = USDC(state.pool.tvl + 1000);
-      pushEvent("LP $1.000 USDC yatırdı", "tUSDC mint edildi · havuz TVL güncellendi", "info");
+      pushEvent("event.lpDeposit", { amount: "1,000" }, "info");
       break;
     }
 
     case "register_agent": {
       state.agent.bond = 50;
-      state.agent.limit = 50; // bond × 1.0x (yeni ajan çarpanı)
+      state.agent.limit = 50; // bond × 1.0x (new-agent multiplier)
       state.agent.status = "Active";
       state.agent.score = 0;
-      pushEvent("Operatör ajanı kaydetti", "bond $50 → limit $50 (1.0x) · cüzdan bakiyesi $0", "info");
+      pushEvent("event.registerAgent", { bond: 50, limit: 50 }, "info");
       break;
     }
 
@@ -91,11 +94,7 @@ export function applyAction(action: DemoAction): DemoState {
       if (state.agent.status !== "Active") break;
       state.channel = { deposit: 5, settled: 0, open: true };
       state.pool.openExposure = USDC(state.pool.openExposure + 5);
-      pushEvent(
-        "Kredili kanal açıldı",
-        "tavan $5 · payer = Pool PDA · signer = Ajan · payee = Merchant",
-        "info"
-      );
+      pushEvent("event.openChannel", { ceiling: 5 }, "info");
       break;
     }
 
@@ -103,7 +102,7 @@ export function applyAction(action: DemoAction): DemoState {
       if (!state.channel.open) break;
       const next = Math.min(state.channel.deposit, USDC(state.channel.settled + 0.7));
       state.channel.settled = next;
-      pushEvent("Ajan inference ödemesi yaptı", `tüketilen: $${next.toFixed(2)} / $${state.channel.deposit.toFixed(2)}`, "info");
+      pushEvent("event.consume", { consumed: next.toFixed(2), deposit: state.channel.deposit.toFixed(2) }, "info");
       break;
     }
 
@@ -115,11 +114,7 @@ export function applyAction(action: DemoAction): DemoState {
       state.pool.openExposure = USDC(state.pool.openExposure - state.channel.deposit);
       state.agent.debt = USDC(state.agent.debt + settled);
       state.channel.open = false;
-      pushEvent(
-        "Kanal kapandı, iade havuza döndü",
-        `$${settled.toFixed(2)} merchant'a · $${refund.toFixed(2)} havuza geri — AHA anı`,
-        "success"
-      );
+      pushEvent("event.settleClose", { settled: settled.toFixed(2), refund: refund.toFixed(2) }, "success");
       break;
     }
 
@@ -128,7 +123,7 @@ export function applyAction(action: DemoAction): DemoState {
       const amount = state.agent.debt;
       state.agent.debt = 0;
       state.agent.score = Math.min(1000, state.agent.score + 50);
-      pushEvent("Operatör borcu ödedi", `$${amount.toFixed(2)} repay · LP share fiyatı artar · skor +50`, "success");
+      pushEvent("event.repay", { amount: amount.toFixed(2) }, "success");
       break;
     }
 
@@ -136,7 +131,7 @@ export function applyAction(action: DemoAction): DemoState {
       state.channel = { deposit: 5, settled: 5, open: true };
       state.agent.debt = USDC(state.agent.debt + 5);
       state.pool.openExposure = USDC(state.pool.openExposure + 5);
-      pushEvent("İkinci ajan tüketti, ödemedi", "$5.00 borç · vade + grace dolmak üzere", "info");
+      pushEvent("event.badAgentConsume", { debt: "5.00" }, "info");
       break;
     }
 
@@ -149,20 +144,12 @@ export function applyAction(action: DemoAction): DemoState {
       state.agent.score = 0;
       state.channel.open = false;
       state.pool.openExposure = USDC(Math.max(0, state.pool.openExposure - 5));
-      pushEvent(
-        "mark_default tetiklendi",
-        `vade + grace geçti · kanallar kapatıldı · $${fromBond.toFixed(2)} operatör bond'u slash edildi · LP zararsız`,
-        "danger"
-      );
+      pushEvent("event.markDefault", { slashed: fromBond.toFixed(2) }, "danger");
       break;
     }
 
     case "blocked_attack": {
-      pushEvent(
-        "Allowlist dışı kanal denemesi reddedildi",
-        "RED: merchant allowlist'te değil — para asla ajan cüzdanına ulaşmadı",
-        "danger"
-      );
+      pushEvent("event.blockedAttack", {}, "danger");
       break;
     }
   }

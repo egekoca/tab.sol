@@ -6,8 +6,8 @@ const MERCHANT_URL = process.env.NEXT_PUBLIC_TAB_MERCHANT_URL ?? "http://localho
 
 export interface DemoEvent {
   id: string;
-  label: string;
-  detail: string;
+  key: string;
+  params: Record<string, string | number>;
   tone: "info" | "success" | "danger";
   at: number;
 }
